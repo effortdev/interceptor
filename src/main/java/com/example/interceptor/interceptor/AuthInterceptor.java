@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 
 @Slf4j
 @Component
@@ -18,9 +21,20 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         String url = request.getRequestURI();
 
+        URI uri = UriComponentsBuilder.fromUriString(request.getRequestURI()).query(request.getQueryString()).build().toUri();
+
         log.info("request : {}", url);
         boolean hasAnnotation = checkAnnotation(handler, Auth.class);
         log.info("has annotation : {}", hasAnnotation);
+
+        if(hasAnnotation){
+            String query = uri.getQuery();
+            log.info("query : {}", query);
+            if(query.equals("name:steve")){
+                return true;
+            }
+            return false;
+        }
 
         return true;
     }
